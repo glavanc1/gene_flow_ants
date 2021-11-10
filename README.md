@@ -29,15 +29,16 @@ We used the `mem` algorithm of `bwa` version 0.7.17 and converted to bam format 
 ## SNP calling
 We created a `popmap.txt` file with all individuals belonging to the same population.
 
-`ls clean/ | grep '.fq.gz' | sed 's/.fq.gz//' > individuals.tmp
+```bash
+ls clean/ | grep '.fq.gz' | sed 's/.fq.gz//' > individuals.tmp
 NIND=$(wc individuals.tmp | cut -f 4 -d ' ')
 yes 1 | head -n $NIND > ones.tmp
 paste individuals.tmp ones.tmp > popmap.txt
 rm *.tmp
-`
+```
 We then called SNPs using `stacks` v2.3e. We ran `gstacks` and `populations` using the following commands:
 
-`gstacks -t 16 --phasing-dont-prune-hets --ignore-pe-reads -M ./popmap.txt -I ./mapped -O ./stacks`
-
-`populations -t 16 -M ./popmap.txt -P ./stacks -O ./out --write-single-snp --vcf
-`
+```bash
+gstacks -t 16 --phasing-dont-prune-hets --ignore-pe-reads -M ./popmap.txt -I ./mapped -O ./stacks
+populations -t 16 -M ./popmap.txt -P ./stacks -O ./out --write-single-snp --vcf
+```

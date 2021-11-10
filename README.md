@@ -31,7 +31,7 @@ We created a `popmap.txt` file with all individuals belonging to the same popula
 
 ```bash
 ls clean/ | grep '.fq.gz' | sed 's/.fq.gz//' > individuals.tmp
-NIND=$(wc individuals.tmp | cut -f 4 -d ' ')
+NIND=$(wc -l individuals.tmp | cut -f 1 -d ' ')
 yes 1 | head -n $NIND > ones.tmp
 paste individuals.tmp ones.tmp > popmap.txt
 rm *.tmp

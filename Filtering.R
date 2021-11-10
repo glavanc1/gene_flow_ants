@@ -1,6 +1,8 @@
 ## Read the data (output of filtering_tests.sh)
-filt <- read.table("summary_filtering.txt", h=T)
+filt <- read.table("./out/summary_filtering.txt", h=T)
 col.names(filt) <- c("DP", "max_miss", "kept")
+
+png("./results/Filtering_summary.png", width = 800, height = 800)
 
 ## Create an empty plot
 plot(0, type="n", xlim=range(filt$max_miss), ylim=c(0, max(filt$kept)), las=1, xlab="Proportion of individuals whith non-missing data", ylab="Number of loci retained")
@@ -12,3 +14,5 @@ for (i in unique(filt$DP)) {
 
 ## Add a legend
 legend("topright", pch=19, col = seasun(17), legend=unique(filt$DP), bty="n", ncol=2)
+
+dev.off()

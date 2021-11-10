@@ -23,16 +23,20 @@ We mapped the reads onto published assemblies (one reference per genus). Accessi
 
 ## General workflow
 All genera were analysed the same way. One directory was created per genus (hereafter `.`). Several subdirectories were created:
-```bash
-                      .
-                      |
- --------------------------------------------
- |      |       |        |       |          |
-raw   clean   stacks    out   results   admixture
+
 ```
+                          .
+                          |
+ -----------------------------------------------------
+ |      |       |        |       |          |        |
+raw   clean   mapped   stacks    out   results   admixture
+```
+The different pipeline components were run separately to adapt resource requirements.
+
 
 ## Mapping to the reference genomes
 We used the `mem` algorithm of `bwa` version 0.7.17 and converted to bam format using `samtools` version 1.4. The script `bwa_mem_SLURM_script_maker.sh` was used to produce one SLURM script for each individual.
+We checked the proportion of reads mapping onto the reference genome using the script `mapping_stats.sh` and visualized the results in `R` using `Mapping.R`.
 
 ## SNP calling
 We created a `popmap.txt` file with all individuals belonging to the same population.
@@ -53,6 +57,8 @@ populations -t 16 -M ./popmap.txt -P ./stacks -O ./out --write-single-snp --vcf
 
 ## Filtering
 We tested the effect of different filtering criteria on the number of retained SNPs using the script `filtering_tests.sh` We then visualised the results in `R` using the script `Filtering.R`.
+
+
 
 
 

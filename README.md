@@ -21,9 +21,17 @@ We mapped the reads onto published assemblies (one reference per genus). Accessi
 | Temnothorax  | unifasciatus              | *GAGA*                      |
 | Tetramorium  | immigrans                 | PRJNA533534                 |
 
-All genera were analysed the same way.
+## General workflow
+All genera were analysed the same way. One directory was created per genus (hereafter `.`). Several subdirectories were created:
+```bash
+                      .
+                      |
+ --------------------------------------------
+ |      |       |        |       |          |
+raw   clean   stacks    out   results   admixture
+```
 
-## Mapping to the reference genomes.
+## Mapping to the reference genomes
 We used the `mem` algorithm of `bwa` version 0.7.17 and converted to bam format using `samtools` version 1.4. The script `bwa_mem_SLURM_script_maker.sh` was used to produce one SLURM script for each individual.
 
 ## SNP calling
@@ -42,3 +50,9 @@ We then called SNPs using `stacks` v2.3e. We ran `gstacks` and `populations` usi
 gstacks -t 16 --phasing-dont-prune-hets --ignore-pe-reads -M ./popmap.txt -I ./mapped -O ./stacks
 populations -t 16 -M ./popmap.txt -P ./stacks -O ./out --write-single-snp --vcf
 ```
+
+## Filtering
+We tested the effect of different filtering criteria on the number of retained SNPs using the script `filtering_tests.sh` We then visualised the results in `R` using the script `Filtering.R`.
+
+
+

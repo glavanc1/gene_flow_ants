@@ -10,16 +10,16 @@ They were demultiplexed using the `process_radtags` command of [stacks](https://
 ## Reference genomes
 We mapped the reads onto published assemblies (one reference per genus). Accession numbers are given below (*italics = needs to be completed once they are published*):
 
-| Genus        | Species used as reference | Bioproject accession number |
-|:-------------|:--------------------------| ---------------------------:|
-| Camponotus   | floridanus                | PRJNA445978                 |
-| Formica      | selysi                    | PRJNA557079                 |
-| Lasius       | niger                     | *GAGA*                      |
-| Leptothorax  | acervorum                 | *GAGA*                      |
-| Myrmica      | rubra                     | *GAGA*                      |
-| Tapinoma     | erraticum                 | *got it from Jonathan*      |
-| Temnothorax  | unifasciatus              | *GAGA*                      |
-| Tetramorium  | immigrans                 | PRJNA533534                 |
+| Genus          | Species used as reference | Bioproject accession number |
+|:---------------|:--------------------------| ---------------------------:|
+| *Camponotus*   | *floridanus*              | PRJNA445978                 |
+| *Formica*      | *selysi*                  | PRJNA557079                 |
+| *Lasius*       | *niger*                   | *GAGA*                      |
+| *Leptothorax*  | *acervorum*               | *GAGA*                      |
+| *Myrmica*      | *rubra*                   | *GAGA*                      |
+| *Tapinoma*     | *erraticum*               | *got it from Jonathan*      |
+| *Temnothorax*  | *unifasciatus*            | *GAGA*                      |
+| *Tetramorium*  | *immigrans*               | PRJNA533534                 |
 
 ## General workflow
 All genera were analysed the same way. One directory was created per genus (hereafter `.`). Several subdirectories were created:

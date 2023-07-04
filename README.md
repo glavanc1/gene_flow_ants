@@ -3,23 +3,10 @@
 This is the repository for the scripts used in this study:
 >Preprint ref one day maybe who knows?
 
-## Demultiplexed read acquisition
+## 1.Demultiplexed read acquisition
 The SRA accession numbers for the demultiplexed reads used in this study will be available in `somewhere`.
 They were demultiplexed using the `process_radtags` command of [stacks](https://catchenlab.life.illinois.edu/stacks/) v2.3e with the `-c -q -r -t 143 --filter_illumina`. options.
 
-## Reference genomes
-We mapped the reads onto published assemblies (one reference per genus). Accession numbers are given below (*italics = needs to be completed once they are published*):
-
-| Genus          | Species used as reference | Bioproject accession number |
-|:---------------|:--------------------------| ---------------------------:|
-| *Camponotus*   | *floridanus*              | PRJNA445978                 |
-| *Formica*      | *selysi*                  | PRJNA557079                 |
-| *Lasius*       | *niger*                   | *GAGA*                      |
-| *Leptothorax*  | *acervorum*               | *GAGA*                      |
-| *Myrmica*      | *rubra*                   | *GAGA*                      |
-| *Tapinoma*     | *erraticum*               | *got it from Jonathan*      |
-| *Temnothorax*  | *unifasciatus*            | *GAGA*                      |
-| *Tetramorium*  | *immigrans*               | PRJNA533534                 |
 
 ## General workflow
 All genera were analysed the same way. One directory was created per genus (hereafter `.`). Several subdirectories were created:
@@ -33,12 +20,26 @@ raw   clean   mapped   stacks    out   results   admixture
 ```
 The different pipeline components were run separately to adapt resource requirements.
 
+## 2.Mapping to the reference genomes
+We mapped the reads onto published assemblies (one reference per genus). Accession numbers are given below (*italics = needs to be completed once they are published*):
 
-## Mapping to the reference genomes
+| Genus          | Species used as reference | Bioproject accession number |
+|:---------------|:--------------------------| ---------------------------:|
+| *Camponotus*   | *floridanus*              | PRJNA445978                 |
+| *Formica*      | *selysi*                  | PRJNA557079                 |
+| *Lasius*       | *niger*                   | *GAGA*                      |
+| *Leptothorax*  | *acervorum*               | *GAGA*                      |
+| *Myrmica*      | *rubra*                   | *GAGA*                      |
+| *Tapinoma*     | *erraticum*               | *got it from Jonathan*      |
+| *Temnothorax*  | *unifasciatus*            | *GAGA*                      |
+| *Tetramorium*  | *immigrans*               | PRJNA533534                 |
+
+
 We used the `mem` algorithm of `bwa` version 0.7.17 and converted to bam format using `samtools` version 1.4. The script `bwa_mem_SLURM_script_maker.sh` was used to produce one SLURM script for each individual.
-We checked the proportion of reads mapping onto the reference genome using the script `mapping_stats.sh` and visualized the results in `R` using `Mapping.R`.
+We checked the proportion of reads mapping onto the reference genome using the script `mapping_stats.sh` and visualized the results in `R` using `Mapping.R
 
-## SNP calling
+
+## 3.SNP calling
 We created a `popmap.txt` file with all individuals belonging to the same population.
 
 ```bash
@@ -55,10 +56,22 @@ gstacks -t 16 --phasing-dont-prune-hets --ignore-pe-reads -M ./popmap.txt -I ./m
 populations -t 16 -M ./popmap.txt -P ./stacks -O ./out --write-single-snp --vcf
 ```
 
-## Filtering
-We tested the effect of different filtering criteria on the number of retained SNPs using the script `filtering_tests.sh` We then visualised the results in `R` using the script `Filtering.R`.
+## 4.Removing contaminations and filtering
+We discarded individuals with more than 75% of missing data.
 
+We estimated the presence of contaminations and filtered them based on Allelic Depth Ratio (ADR) using the script `ADR_filtering.R` with the default cutoff (0.01).
 
+We then visualized the effect of different filtering criteria on the number of retained SNPs using the script `filtering_tests.sh` and visualised the results in `R` using the script `Filtering.R`.
+For all genera, we selected *a posteriori* a minimum depth cutoff of 8 reads (which gives below 1% of allelic dropout), a minor allele count of 3, and a maximum 75% of individuals with missing genotypes per locus. This was performed in `vcftools` v0.1.14:
 
+```
+vcftools --vcf FILENAME.vcf --minDP 8 --mac 2 --max-missing 0.75 --recode --out OUTPUTNAME.vcf
+```
+
+## 5.Taxonomy
+
+## 6.Hybridization rates
+
+## 7.Correlates of hybridization
 
 

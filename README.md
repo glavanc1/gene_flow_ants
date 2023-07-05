@@ -57,19 +57,21 @@ populations -t 16 -M ./popmap.txt -P ./stacks -O ./out --write-single-snp --vcf
 ```
 
 ## 4.Removing contaminations and filtering
-We discarded individuals with more than 75% of missing data.
-
-We estimated the presence of contaminations and filtered them based on Allelic Depth Ratio (ADR) using the script `ADR_filtering.R` with the default cutoff (0.01).
-
-We then visualized the effect of different filtering criteria on the number of retained SNPs using the script `filtering_tests.sh` and visualised the results in `R` using the script `Filtering.R`.
-For all genera, we selected *a posteriori* a minimum depth cutoff of 8 reads (which gives below 1% of allelic dropout), a minor allele count of 3, and a maximum 75% of individuals with missing genotypes per locus. This was performed in `vcftools` v0.1.14:
-
+We visualized the effect of different filtering criteria on the number of retained SNPs using the script `filtering_tests.sh` and visualised the results in `R` using the script `Filtering.R`.
+We selected *a posteriori* a minimum depth cutoff of 8 reads (which gives below 1% of allelic dropout), a minor allele count of 3, and a maximum 75% of individuals with missing genotypes per locus. This was performed in `vcftools` v0.1.14:
 ```
 vcftools --vcf FILENAME.vcf --minDP 8 --mac 2 --max-missing 0.75 --recode --out OUTPUTNAME.vcf
 ```
+We discarded individuals with more than 75% of missing data. We then estimated the presence of contaminations and filtered them based on Allelic Depth Ratio (ADR) using the script `ADR_filtering.R` with the default cutoff (0.01). Both these things were done in `R` with the script `ADR_filtering.R`.
+
+We then ran the same `vcftools` command as above to filter again after having discarded the individuals with high missing data and corrected depth at some loci. The output was considered the final dataset for the first step (Taxonomy).
 
 ## 5.Taxonomy
-
+We ran a series of analyses:
+- phylogeny of a fragment of COI. We aligned our COI sequences, along with reference individuals from published studies when available, with `mafft` v7.475: `mafft --localpair  --maxiterate 16 --phylipout --inputorder all_COI.fasta > all_clean_trimmed_alignment_COI.phylip`. We then reconstructed a ML phylogeny with `iqtree` v2.0.6: `iqtree2 -T 1 -s clean_trimmed_alignment_COI.phylip -m MFP -B 1000`.
+- `admixture` with a range of K values (depending on the number of expected species in each genus, based on the number of morphological species). This was done using the script `runadmixture.sh`.
+- Multi-Dimensional Scaling. This, along with the visualization of the results of the other analyses and the selection of individuals for further steps, was done in `R` with the scripts `GENUSNAME_Analyses.R`.
+- 
 ## 6.Hybridization rates
 
 ## 7.Correlates of hybridization

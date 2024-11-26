@@ -60,7 +60,7 @@ populations -t 16 -M ./popmap.txt -P ./stacks -O ./out --write-single-snp --vcf
 We visualized the effect of different filtering criteria on the number of retained SNPs using the script `filtering_tests.sh` and visualised the results in `R` using the script `Filtering.R`.
 We selected *a posteriori* a minimum depth cutoff of 8 reads (which gives below 1% of allelic dropout), a minor allele count of 3, and a maximum 75% of individuals with missing genotypes per locus. This was performed in `vcftools` v0.1.14:
 ```
-vcftools --vcf FILENAME.vcf --minDP 8 --mac 2 --max-missing 0.75 --recode --out OUTPUTNAME.vcf
+vcftools --vcf FILENAME.vcf --minDP 8 --max-meanDP 200 --mac 2 --max-missing 0.75 --recode --out OUTPUTNAME.vcf
 ```
 We discarded individuals with more than 75% of missing data. We then estimated the presence of contaminations and filtered them based on Allelic Depth Ratio (ADR) using the script `ADR_filtering.R` with the default cutoff (0.01). Both these things were done in `R` with the script `ADR_filtering.R`.
 

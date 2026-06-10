@@ -1,7 +1,8 @@
 # Gene flow in ants
 
 This is the repository for the scripts used in this study:
->Preprint ref one day maybe who knows?
+>Widespread but cryptic introgression shapes genetic diversity in natural populations
+>by Guillaume Lavanchy, Ludovic Ruedi, Olivier Broennimann, Kristine Jecha, Marianna Tzivanopoulou, Jérôme Goudet, Tanja Schwander
 
 ## 1.Demultiplexed read acquisition
 The SRA accession numbers for the demultiplexed reads used in this study will be available in `somewhere`.
@@ -9,34 +10,24 @@ They were demultiplexed using the `process_radtags` command of [stacks](https://
 
 
 ## General workflow
-All genera were analysed the same way. One directory was created per genus (hereafter `.`). Several subdirectories were created:
-
-```
-                          .
-                          |
- -----------------------------------------------------
- |      |       |        |       |          |        |
-raw   clean   mapped   stacks    out   results   admixture
-```
-The different pipeline components were run separately to adapt resource requirements.
+Each genus was analyzed separately but all genera were analysed the same way. One directory was created per genus (hereafter `.`).
 
 ## 2.Mapping to the reference genomes
-We mapped the reads onto published assemblies (one reference per genus). Accession numbers are given below (*italics = needs to be completed once they are published*):
+We mapped the reads onto published assemblies (one reference per genus). Accession numbers are given below:
 
-| Genus          | Species used as reference | Bioproject accession number |
+| Genus          | Species used as reference | NCBI accession number or link |
 |:---------------|:--------------------------| ---------------------------:|
-| *Camponotus*   | *floridanus*              | PRJNA445978                 |
-| *Formica*      | *selysi*                  | PRJNA557079                 |
-| *Lasius*       | *niger*                   | *GAGA*                      |
-| *Leptothorax*  | *acervorum*               | *GAGA*                      |
-| *Myrmica*      | *rubra*                   | *GAGA*                      |
-| *Tapinoma*     | *erraticum*               | *got it from Jonathan*      |
-| *Temnothorax*  | *unifasciatus*            | *GAGA*                      |
-| *Tetramorium*  | *immigrans*               | PRJNA533534                 |
+| *Camponotus*   | *fallax*                  | GCF_003227725               |
+| *Formica*      | *selysi*                  | GCA_009859135               |
+| *Lasius*       | *niger*                   | GCA_041902855.1             |
+| *Myrmica*      | *rubra*                   | GCA_048181765.1             |
+| *Tapinoma*     | *erraticum*               | https://zenodo.org/records/5705739      |
+| *Temnothorax*  | *unifasciatus*            | GCA_048541725.1             |
+| *Tetramorium*  | *immigrans*               | GCA_011636585.1             |
 
 
-We used the `mem` algorithm of `bwa` version 0.7.17 and converted to bam format using `samtools` version 1.4. The script `bwa_mem_SLURM_script_maker.sh` was used to produce one SLURM script for each individual.
-We checked the proportion of reads mapping onto the reference genome using the script `mapping_stats.sh` and visualized the results in `R` using `Mapping.R
+We used the script `map_and_clean.sh` to map the reads with the `mem` algorithm of `bwa` version 0.7.17 and to process them using using `samtools` version 1.4. 
+We checked the proportion of reads mapping onto the reference genome using the script `mapping_stats.sh` and visualized the results in `R` using `Mapping.R`.
 
 
 ## 3.SNP calling

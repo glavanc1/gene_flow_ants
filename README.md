@@ -53,7 +53,8 @@ We selected *a posteriori* a minimum depth cutoff of 8 reads (which gives below 
 ```
 vcftools --vcf FILENAME.vcf --minDP 8 --max-meanDP 200 --mac 2 --max-missing 0.75 --recode --out OUTPUTNAME.vcf
 ```
-We discarded individuals with more than 75% of missing data. We then estimated the presence of contaminations and filtered them based on Allelic Depth Ratio (ADR) using the script `ADR_filtering.R` with the default cutoff (0.01). Both these things were done in `R` with the script `ADR_filtering.R`.
+
+After this first filtering, we discarded individuals with more than 75% of missing data. We then estimated the presence of contaminations and filtered them based on Allelic Depth Ratio (ADR) using the script `ADR_filtering.R` with the default cutoff (0.01). Both these things were done in `R` with the script `ADR_filtering.R`.
 
 We then ran the same `vcftools` command as above to filter again after having discarded the individuals with high missing data and corrected depth at some loci. The output was considered the final dataset for the first step (Taxonomy).
 

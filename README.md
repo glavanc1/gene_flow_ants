@@ -94,15 +94,22 @@ We aligned our COI sequences, along with reference individuals from published st
 We then reconstructed a ML phylogeny with `iqtree` v2.0.6: `iqtree2 -T 1 -s clean_trimmed_alignment_COI.phylip -m MFP -B 1000`.
 
 ### Clustering
-We ran `admixture` with a range of K values (depending on the number of expected species in each genus, based on the number of morphological species). This was done using the script `runadmixture.sh`.
+We ran `admixture` with K ranging from 1 to 20, in 10 replicates for each run. This was done using the script `runadmixture.sh`. We then selected the best K based on the shape of the cross-validation (CV) error curve (aiming for the lowest K at the asymptote of the curve) and selected the replicate with the lower CV error with that value of K. This was done with the `R` scripts `GENUSNAME_Analyses.R`.
 
 ### Multi-Dimensional Scaling.
 This, along with the visualization of the results of the other analyses and the selection of individuals for further steps, was done in `R` with the scripts `GENUSNAME_Analyses.R`.
 
 ## 7.Introgression rates
-We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script `2nd_admixture.sh`.
+We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script `2nd_admixture.sh`. We ran 20 replicates with K = the number of retained species. We visualized the results and extracted introgression estimates in `GENUSNAME_Analyses.R`.
 
 ## 8.Contribution to genetic diversity
+We ran the `populations` module of stacks again, this time outputting a gvcf:
+```bash
+populations -t 24 -M popmap.txt -r 0.05 -P . -O ../7_pi --vcf-all
+```
+We then estimated pi with and without hybrids using the script `pi_estimation.sh`. The script was originally designed to also estimate it for individuals with different levels of introgression, which ended up being overly complicated and not very interesting, so only the outputs with the minimum maxQlist (i.e. the one including all hybrids) and the MaxQlist-0.9999 (i.e. only including absolutely pure individuals) were used in the end.
+
+The outputs were analyzed and visualized in `R` with the script `pi.R`.
 
 ## 9.Correlates of hybridization and visualization
 

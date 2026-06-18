@@ -1,0 +1,45 @@
+sp;day_extreme_min;day_min;day_mean;day_max;day_extreme_max;hour_extreme_min;hour_min;hour_mean;hour_max;hour_extreme_max;comments
+Camp_lign;123;146;156;166;177;10:50;13:40;16:19;18:58;20:15;
+Camp_fall;116;118;130;142;151;;12:00;;17:30;;
+Camp_herc;138;144;163;182;215;14:22;15:08;16:45;18:22;19:00;
+Form_cuni;159;172;185;198;217;;;07:49;;;
+Form_exse;161;192;213;234;261;;05:30;;12:30;;"""mostly in early morning"""
+Form_fusca;172;187;211;235;257;;10:00;;18:55;;
+Form_lema;215;215;231;247;261;;10:18;;16:00;;probably in two clusters
+Form_lugu;140;152;178;204;225;06:28;07:19;08:58;10:37;12:00;
+Form_para;135;153;171;189;196;;08:25;;17:25;;
+Form_poly;88;106;129;152;173;;12:06;;14:30;;
+Form_prat_1st_gen;105;140;161;182;205;;07:23;;13:35;;
+Form_prat_2nd_gen;211;220;238;256;274;;07:23;;13:35;;
+Form_pres;169;187;205;223;247;;;08:20;;;one_observation
+Form_rufa_1;110;128;150;172;191;;10:45;;11:30;;
+Form_rufa_2;110;128;150;172;191;;16:30;;17:00;;
+Form_rufi;167;175;189;203;215;07:30;07:39;08:49;09:59;10:30;
+Form_sang;145;173;199;225;258;;07:00;;15:00;;
+Lasi_brun;139;151;168;185;216;;12:00;;14:00;;
+Lasi_emar;161;186;205;224;247;;20:37;;24:15:00;;"""from 37mn before to 181 mn after sunset""; sunset happens at 21:14 on July 24th (mean day) in Lausanne"
+Lasi_mixt;242;253;269;285;298;;;;;;"""one observation was 80 min before sunset, four observations 50-150 minutes after sunset refer to catches at lights"""
+Lasi_para;;196;;291;;;15:00;;18:00;;
+Lasi_plat;172;188;208;228;241;13:36;14:09;15:55;17:41;18:00;
+Lasi_fuli_1;123;143;158;173;182;12:00;14:57;17:09;19:21;20:20;
+Lasi_fuli_2;194;194;217;240;300;12:00;14:57;17:09;19:21;20:20;
+Lasi_nige;177;190;206;222;249;09:07;11:55;14:06;16:17;18:40;
+Lasi_flav;192;208;231;254;294;15:24;15:31;16:30;17:29;18:16;
+Myrm_spec;181;214;232;250;253;;;;;;no info on daily swarming time
+Myrm_rubr_1;208;220;239;258;275;;07:24;;11:10;;
+Myrm_rubr_2;208;220;239;258;275;;15:08;;18:24;;
+Myrm_rugi;188;204;221;238;270;;15:00;;22:00;;
+Myrm_sabu;188;214;233;252;269;08:33;;;;17:13;
+Myrm_sche;201;216;234;252;269;;08:45;;17:00;;
+Myrm_scab;208;222;241;260;265;10:24;12:12;14:31;16:50;18:24;
+Myrm_lobu;202;200;226;252;267;;;11:15;;;two observations at the same time
+Tapi_erra;156;162;172;182;188;;;;;;no info on daily swarming time
+Tapi_magn;92;120;147;174;174;;;09:23;;;N=1
+Tapi_subb;154;160;173;186;190;;;;;;no info on daily swarming time
+Temn_unif;167;181;193;205;211;;04:52;;06:52;;"""swarming 1h before to 1h after sunrise""; sunrise happens at 5:52 on July 12th (mean day) in Lausanne"
+Temn_nigr;161;166;195;224;257;;06:08;;10:58;;"""between 10 minutes after sunrise to 5 h after sunrise""; sunrise happens at 5:58 on July 18th (mean day) in Lausanne"
+Temn_affi;187;198;218;238;253;;05:51;;08:21;;"""30mn before to 120 mn after sunrise""; sunrise happens at 6:21 on August 6th (mean day) in Lausanne"
+Temn_nyla;196;206;224;242;254;;18:18;;21:22;;"""from 2.5h before sunset to dusk""; sunset at 20:48 and dusk at 21:22 on August 12th in Lausanne"
+Tetr_immi;151;159;178;197;223;;;;;;no info on daily swarming time
+Tetr_caes;148;161;178;195;231;;;;;;no info on daily swarming time
+Tetr_impu;174;202;232;262;309;;;;;;no info on daily swarming time

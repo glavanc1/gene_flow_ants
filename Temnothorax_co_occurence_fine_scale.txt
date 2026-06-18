@@ -1,0 +1,5 @@
+Temn_affi Temn_nigr Temn_nyla Temn_unif
+NA 0 1 0
+0 NA 0 0
+0.0208333333333333 0 NA 0
+NA NA NA NA

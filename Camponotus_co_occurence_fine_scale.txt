@@ -1,0 +1,4 @@
+Camp_fall Camp_herc Camp_lign
+NA NA NA
+NA NA NA
+NA NA NA

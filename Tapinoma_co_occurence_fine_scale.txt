@@ -1,0 +1,5 @@
+Tapi_dari Tapi_erra Tapi_magn Tapi_subb
+NA NA NA NA
+0 NA 0 0
+NA NA NA NA
+0 0 0 NA

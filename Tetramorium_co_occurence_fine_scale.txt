@@ -1,0 +1,4 @@
+Tetr_caes Tetr_immi Tetr_impu
+NA 0 0
+NA NA NA
+0 0 NA

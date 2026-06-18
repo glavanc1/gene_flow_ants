@@ -100,7 +100,8 @@ We ran `admixture` with a range of K values (depending on the number of expected
 This, along with the visualization of the results of the other analyses and the selection of individuals for further steps, was done in `R` with the scripts `GENUSNAME_Analyses.R`.
 
 ## 7.Introgression rates
-We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script 
+We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script `2nd_admixture.sh`.
+
 ## 8.Contribution to genetic diversity
 
 ## 9.Correlates of hybridization and visualization

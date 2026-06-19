@@ -100,7 +100,7 @@ We ran `admixture` with K ranging from 1 to 20, in 10 replicates for each run. T
 This, along with the visualization of the results of the other analyses and the selection of individuals for further steps, was done in `R` with the scripts `GENUSNAME_Analyses.R`.
 
 ## 7.Introgression rates
-We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script `2nd_admixture.sh`. We ran 20 replicates with K = the number of retained species. We visualized the results and extracted introgression estimates in `GENUSNAME_Analyses.R`.
+We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script `2nd_admixture.sh`. We ran 20 replicates with K = the number of retained species. We visualized the results and extracted introgression estimates in `GENUSNAME_Analyses.R`. The outputs are 
 
 ## 8.Contribution to genetic diversity
 We ran the `populations` module of stacks again, this time outputting a gvcf:
@@ -113,4 +113,16 @@ The outputs were analyzed and visualized in `R` with the script `pi.R`.
 
 ## 9.Correlates of hybridization and visualization
 
+### Phenology
+The phenology of all species was taken from Seifert (2018) and is availalbe as `Phenology.csv`.
 
+### Ecological niche
+Ecological niche overlap was estimated with the R script `niche overlap.R`.
+
+### Fine-scale spatial overlap
+Co-occurence in sampling plots was estimated for each genus in the `GENUSNAME_Analyses.R` scripts.
+
+### Genetic divergence (dXY)
+Genetic divergence was estimated with the script `dxy.sh`.
+
+### 

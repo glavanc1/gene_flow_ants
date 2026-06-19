@@ -88,6 +88,7 @@ We then ran the same `vcftools` command as above to filter again after having di
 
 ## 6.Taxonomy
 We ran a series of analyses:
+
 ### phylogeny of a fragment of COI.
 We aligned our COI sequences, along with reference individuals from published studies when available, with `mafft` v7.475:
 `mafft --localpair  --maxiterate 16 --phylipout --inputorder all_COI.fasta > all_clean_trimmed_alignment_COI.phylip`.
@@ -117,7 +118,7 @@ The outputs were analyzed and visualized in `R` with the script `pi.R`.
 The phenology of all species was taken from Seifert (2018) and is availalbe as `Phenology.csv`.
 
 ### Ecological niche
-Ecological niche overlap was estimated with the R script `niche overlap.R`.
+Ecological niche overlap was estimated with the R script `niche overlap.R`, and the output is available as `niche_overlap.txt`.
 
 ### Fine-scale spatial overlap
 Co-occurence in sampling plots was estimated for each genus in the `GENUSNAME_Analyses.R` scripts.
@@ -125,4 +126,5 @@ Co-occurence in sampling plots was estimated for each genus in the `GENUSNAME_An
 ### Genetic divergence (dXY)
 Genetic divergence was estimated with the script `dxy.sh`.
 
-### 
+### Overall analyses and visualization
+The script `All_genera.R` was used to analyze and visualize the results.

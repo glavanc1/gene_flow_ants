@@ -100,7 +100,7 @@ We ran `admixture` with K ranging from 1 to 20, in 10 replicates for each run. T
 This, along with the visualization of the results of the other analyses and the selection of individuals for further steps, was done in `R` with the scripts `GENUSNAME_Analyses.R`.
 
 ## 7.Introgression rates
-We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script `2nd_admixture.sh`. We ran 20 replicates with K = the number of retained species. We visualized the results and extracted introgression estimates in `GENUSNAME_Analyses.R`. The outputs are 
+We ran `admixture` again, this time in supervised mode using the population maps generated in the scripts `GENUSNAME_Analyses.R`, using the script `2nd_admixture.sh`. We ran 20 replicates with K = the number of retained species. We visualized the results and extracted introgression estimates in `GENUSNAME_Analyses.R`. The outputs are given as "GENUSNAME_hyybridization_df.txt".
 
 ## 8.Contribution to genetic diversity
 We ran the `populations` module of stacks again, this time outputting a gvcf:
@@ -120,10 +120,22 @@ The phenology of all species was taken from Seifert (2018) and is availalbe as `
 Ecological niche overlap was estimated with the R script `niche overlap.R`, and the output is available as `niche_overlap.txt`.
 
 ### Fine-scale spatial overlap
-Co-occurence in sampling plots was estimated for each genus in the `GENUSNAME_Analyses.R` scripts.
+Co-occurence in sampling plots was estimated for each genus in the `GENUSNAME_Analyses.R` scripts, and the outputs are given as `GENUSNAME_co_occurence_fine_scale.txt`.
 
 ### Genetic divergence (dXY)
 Genetic divergence was estimated with the script `dxy.sh`.
 
+### Miscelaneous verifications
+Many sanity checks were conducted to ensure that introgression rates were accurately estimated. Most of them were done separately for each genus:
+- Relationship between missing data and introgression (Figure S3)
+- Verification of Linkage disequilibrium decay (Figure S4): done only in *Lasius* because *L. niger* was the species with the species highest sample size for which we had an assembly of the same species.
+- Allelic Depth Ratio in pure and admixed individuals (Figures S5, S6).
+- Variation in admixture proportion across runs (Figure S14).
+- Number of hybrids as a function of admixture thresholds (Table S1).
+- Spatial distribution of hybrids and pure individuals (Figures S17 - S23).
+The code for those is available in the `GENUSNAME_Analyses.R` scripts. In some cases (Figure S14, Table S1), outputs from different genera were combined into one.
+
+In addition, the proportion of mapping reads was estimated independently for each genus (in the respective `GENUSNAME_Analyses.R`), and the outputs were combined and plotted in the `All_genera.R` script to produce the final output (Figure S2).
+
 ### Overall analyses and visualization
-The script `All_genera.R` was used to analyze and visualize the results.
+Summaries of introgression rate across species, statistical analyses of the correlates of introgression rate and other general visualizations are produced by the script `All_genera.R`.

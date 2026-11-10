@@ -395,3 +395,174 @@ co_occurrence_plot <- function(sp) {
 
 co_occ_plot <- co_occurrence_plot(meta$sp.nucl)
 write.table(co_occ_plot, "Camponotus_co_occurence_fine_scale.txt", row.names = F, quote = F)
+
+
+###########################
+### Mapping per species ###
+###########################
+
+mapping <- read.csv("mappingreads_Camponotus.csv", h=T)
+mapping$sp <- meta$sp.nucl[match(mapping$ID, meta$CATALOGUENUMBER)]
+boxplot(mapping$Map.Perc ~ mapping$sp, las=2, xlab="", ylab = "Percentage of reads mapping")
+boxplot(mapping$Map.Perc ~ mapping$sp, las=2, xlab="", ylab = "Percentage of reads mapping", ylim=c(80, 100))
+
+mapping$x <- NA
+mapping$x[which(mapping$sp == "Camp_fall")] <- 0
+mapping$x[which(mapping$sp == "Camp_lign")] <- 0.011404068
+mapping$x[which(mapping$sp == "Camp_herc")] <- 0.011510916
+
+plot(mapping$Map.Perc ~ jitter(mapping$x, factor = 2), pch=20, col="#00000030", las=1, xlab = "dxy", ylab = "Percentage of reads mapping")
+plot(mapping$Map.Perc ~ jitter(mapping$x, factor = 2), pch=20, col="#00000030", las=1, xlab = "dxy", ylab = "Percentage of reads mapping", ylim=c(80, 100))
+
+mapping.summary <- data.frame(sp=names(table(mapping$sp)), genus = "Camp", dxy = NA, mapping.mean = NA, mapping.SD = NA)
+for (i in mapping.summary$sp) {
+  mapping.summary$dxy[which(mapping.summary$sp == i)] = mapping$x[which(mapping$sp == i)][1]
+  mapping.summary$mapping.mean[which(mapping.summary$sp == i)] = mean(mapping$Map.Perc[which(mapping$sp == i)])
+  mapping.summary$mapping.SD[which(mapping.summary$sp == i)] = sd(mapping$Map.Perc[which(mapping$sp == i)])
+}
+
+write.table(mapping.summary, "Campo_mapping_summary.txt", quote = F, sep = "\t")
+
+
+########################
+### Maps per species ###
+########################
+# This part was written in large parts by Claude Opus 5.5
+
+library(terra)
+library(sf)
+library(elevatr)
+library(geodata)
+
+crs_ch <- "EPSG:21781"
+
+# ---- 1) Vaud boundary (GADM) ----
+ch   <- geodata::gadm("CHE", level = 1, path = tempdir())
+vaud <- ch[ch$NAME_1 == "Vaud", ]
+
+# ---- 1) Elevation model download (AWS Terrain Tiles via elevatr) ----
+# z = zoom level: 9 ~ 200 m, 10 ~ 100 m, 11 ~ 50 m pixels (higher = slower)
+dem <- elevatr::get_elev_raster(sf::st_as_sf(vaud), z = 10, clip = "bbox")
+dem <- rast(dem)
+
+# ---- 2) Reproject to Swiss coordinates ----
+dem       <- project(dem, crs_ch, method = "bilinear")
+vaud_ch   <- project(vaud, crs_ch)
+dem       <- mask(crop(dem, vaud_ch), vaud_ch)
+
+# ---- 1) Hillshade ----
+slope  <- terrain(dem, "slope",  unit = "radians")
+aspect <- terrain(dem, "aspect", unit = "radians")
+
+# angle = sun elevation (degrees above horizon), direction = sun azimuth (0 = N, 90 = E)
+hs <- shade(slope, aspect, angle = 40, direction = 315)
+
+# Optional: multidirectional hillshade (average of several sun azimuths)
+# hs <- mean(rast(lapply(c(270, 315, 0, 45),
+#                        function(d) shade(slope, aspect, angle = 45, direction = d))))
+
+## Define colour palette and min/max introgression values in the dataset
+meta$introgressed <- NA
+meta$introgressed[match(row.names(Q.for.figure), meta$CATALOGUENUMBER)] <- Q.for.figure$introgressed
+
+palette <- colorRampPalette(c("grey95", "#49196B"))(100)
+
+lmin <- log10(min(meta$introgressed, na.rm = TRUE))
+lmax <- log10(max(meta$introgressed, na.rm = TRUE))
+idx  <- (log10(meta$introgressed) - lmin) / (lmax - lmin)
+
+
+# ---- 3) Plot ----
+par(mfrow=c(1,3), mar=c(0.05,0,0,0))
+for (sp in unique(Q.for.figure$majority_cluster)) {
+  plot(hs, col = grey(0:100 / 100), legend = F, axes = F, main=sp)
+  
+  # add admixture proportion to metadata
+  
+  meta$col.for.map <- palette[1 + round(idx * 99)]
+  meta$pch.for.map <- ifelse(meta$introgressed > 2e-4, 21, 4)  # 21 = filled circle, 4 = x
+  
+  points(meta$X[which(meta$sp.nucl == sp)], meta$Y[which(meta$sp.nucl == sp)], pch = meta$pch.for.map[which(meta$sp.nucl == sp)], bg = meta$col.for.map[which(meta$sp.nucl == sp)], col = 1)
+}
+
+#######################
+### ADR per species ###
+#######################
+
+# Function to apply a sum like pmin or pmax
+# Written by Sven Hohenstein here:
+# https://stackoverflow.com/questions/13123638/there-is-pmin-and-pmax-each-taking-na-rm-why-no-psum
+psum <- function(...,na.rm=FALSE) {
+  dat <- do.call(cbind,list(...))
+  res <- rowSums(dat, na.rm=na.rm)
+  idx_na <- !rowSums(!is.na(dat))
+  res[idx_na] <- NA
+  res
+}
+
+
+# get allelic depth for the reference allele at heterozygous sites
+ad.ref <<- extract.gt(vcf, "AD", as.numeric = T)
+ad.ref[which(dp < 8)] <- NA
+ad.ref.het <<- ad.ref
+ad.ref.het[which(gt %in% c("0/0", "1/1"))] <- NA
+
+# and the alternative allele
+ad.alt <<- dp - ad.ref
+ad.alt[which(dp < 8)] <- NA
+ad.alt.het <<- ad.alt
+ad.alt.het[which(gt %in% c("0/0", "1/1"))] <- NA
+
+# compute allelic depth ratio (ADR), defined as
+# depth at the allele supported by most reads divided by total depth at the locus.
+# takes two matrices with allelic depths (integer) as input
+get.ad.ratio <<- function(ad.ref, ad.alt) return(pmax(ad.ref, ad.alt) / mapply(psum, ad.ref, ad.alt, na.rm=T))
+
+# use the function on the whole dataset
+AD.ratio <- get.ad.ratio(as.matrix(ad.ref.het), as.matrix(ad.alt.het))
+
+# get positions of heterozygote genotypes
+het_genotypes <- which(gt %in% c("0/1", "1/0"))
+
+# subset depth values at heterozygote genotypes only
+dp.het <- dp[het_genotypes]
+
+# this function samples a number of reads for one of the alleles
+# following a binomial distribution and equal probabilities for both alleles
+# given the depth at the locus
+sim.ad <- function(depth) {
+  rbinom(n = 1, size = depth, prob = 0.5)
+}
+
+# probably not the most efficient way but it works.
+# applies sim.ad.ref on observed depth values at heterozygous loci
+sim.ad.ref <- unlist(lapply(X = dp.het, FUN = sim.ad))
+
+# create a dataframe with simulated AD at both alleles
+ad.df <- data.frame(A=sim.ad.ref, B=dp.het - sim.ad.ref)
+
+# compute ADR for the simulated AD values
+sim.ad.ratio <- get.ad.ratio(apply(ad.df, 1, max), apply(ad.df, 1, min))
+
+
+### Loop through species
+
+par(mfrow=c(1,4), mai=c(0.5, 0.1, 0.4, 0.1))
+
+for(sp in unique(sort(Q.for.figure$majority_cluster))) {
+  # Getthe list of individuals from this species
+  individuals <- dimnames(Q.for.figure)[[1]][which(Q.for.figure$majority_cluster == sp)]
+  plot(NULL, xlim=c(0.45, 0.7), ylim=c(0,25), xlab="ADR", ylab="", main=sp, yaxt="n", las=1)
+  # For each individual of this species
+  for (i in which(dimnames(AD.ratio)[[2]] %in% individuals)) {
+    this_individual_name <- dimnames(AD.ratio)[[2]][i]
+    # Only if there are enough non-NA ADR values
+    if (sum(is.na(AD.ratio[,i]) == F) > 10) {
+      col.ADR = "#00000030"
+      if (Q.for.figure$introgressed[which(dimnames(Q.for.figure)[[1]] == this_individual_name)] > 2e-04) {
+        col.ADR <- "red"
+      }
+      points(density(AD.ratio[,i][which(AD.ratio[,i] != 1)], na.rm=T) , type="l", col=col.ADR)
+    }
+  }
+}

@@ -1,7 +1,6 @@
 # Widespread but cryptic introgression shapes genetic diversity in natural populations
 
-This is the repository for the scripts used in the study by Guillaume Lavanchy, Ludovic Ruedi, Olivier Broennimann, Kristine Jecha, Marianna Tzivanopoulou, Jérôme Goudet, Tanja Schwander
-`the link will be added when available`
+This is the repository for the scripts used in the study by Guillaume Lavanchy, Ludovic Ruedi, Olivier Broennimann, Kristine Jecha, Marianna Tzivanopoulou, Jérôme Goudet, Tanja Schwander, currently on [BiorXiv](https://doi.org/10.64898/2026.07.06.736689 )
 
 Each genus was analysed separately, but all genera were analysed the same way.
 

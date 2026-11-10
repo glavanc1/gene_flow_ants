@@ -709,6 +709,25 @@ co_occurrence_plot <- function(sp) {
 co_occ_plot <- co_occurrence_plot(meta$sp.nucl)
 write.table(co_occ_plot, "Lasius_co_occurence_fine_scale.txt", row.names = F, quote = F)
 
+#################################################
+### Summary table with thresholds -- Table S1 ###
+#################################################
+
+intro_table <- data.frame(sp = sort(unique(Q.for.figure$majority_cluster)))
+
+# Set thresholds as average values for all backcross values
+# plus some arbitrary thresholds (10%, 5%, 1%, and 2e-4 which is essentially zero)
+thresholds = c(0.5^(2:11), 0.1, 0.05, 0.01, 2e-4)
+for (t in thresholds) {
+  counts <- tapply(Q.for.figure$introgressed > t,
+                   Q.for.figure$majority_cluster,
+                   sum, na.rm = TRUE)
+  intro_table[[paste0("n_above_", t)]] <- as.vector(counts[as.character(intro_table$sp)])
+}
+
+write.table(intro_table, "Lasius_introgression_thresholds_summary.txt", quote = F, row.names = F)
+
+
 
 ###########################
 ### Mapping per species ###
@@ -745,6 +764,7 @@ write.table(mapping.summary, "Lasi_mapping_summary.txt", quote = F, sep = "\t")
 ################################
 ### Missing data per species ###
 ################################
+
 species = names(table(meta$sp.nucl))
 par(mfrow = c(2, length(species)/2), mai=c(0.8, 0.3, 0.2, 0.1))
 for (i in species) {

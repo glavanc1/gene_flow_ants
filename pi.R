@@ -39,9 +39,9 @@ for (sp in levels(as.factor(pi.data$sp))) {
   }
 }
 
-##################################################################################################
-### This is the overly complicated version that was not retained in the paper, but here you go ###
-##################################################################################################
+##########################################################################
+### Contribution of hybrids to pi ~ different thresholds -- Figure S24 ###
+##########################################################################
 
 # Define relative_pi as pi with the given threshold
 # divided by pi with 0.9999 or 0.9998 (in Formica) as threshold for the same species
@@ -74,9 +74,10 @@ for (sp in levels(as.factor(pi.data$sp))) {
 
 
 
-######################
-### Easier version ###
-######################
+##################################
+### Easier version -- Figure 2 ###
+##################################
+
 pure.pi <- numeric(0)
 max.pi <- numeric(0)
 max.relative.pi <- numeric(0)

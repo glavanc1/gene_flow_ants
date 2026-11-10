@@ -334,8 +334,69 @@ hybrids2nd <- which(apply(k12_renamed, 1, max) < 0.999)
 
 barplot(t(as.matrix(order.structure(k12_renamed[hybrids2nd,]))), col=c("#00A19A", "#006633", "#A97C50", "#CBBBA0", "#9D1E63", "#D7DF23", "#D45E4D", "#603913", "#29235C", "#1B75BC", "#BE1E2D", "#8DC63F"), las = 2, cex.names = 1, space = 0, border = NA)
 
+######################################################
+### Variation in admixture proportions across runs ###
+######################################################
+
+# Create a new dataframe with all individuals and all runs
+Q_replicates <- data.frame(ind = Formica.pop$CATALOGUENUMBER)
+
+# iterate across the 20 admixture replicates
+for (rep in 1:20){
+  # build the path to the Q matrix for one replicate admixture run
+  path <- paste0("2nd_admixture/rep", rep, "/cleaned.12.Q")
+  # load the corresponding Q matrix
+  Q <- as.matrix(read.table(path))
+  # add names
+  dimnames(Q)[[1]] <- Formica.pop$CATALOGUENUMBER
+  dimnames(Q)[[2]] <- dimnames(k12_renamed)[[2]]
+  # get the major cluster assignment for each individual
+  this_Q <- apply(Q, 1, max)
+  # add it to the main dataframe
+  Q_replicates[rep+1] <- this_Q
+  # add the replicate number as column name
+  names(Q_replicates)[rep+1] <- paste0("rep", rep)
+}
+
+# subset only potential hybrids
+# this assumes that any individual with admixture proportion
+# higher than the minimum for the best run is hybrid
+Q_hybrids <- subset(Q_replicates, Q_replicates$rep11 < max(Q_replicates$rep11))
+Q_hybrids <- Q_hybrids[order(Q_hybrids$rep11),]
+Q_hybrids$mean <- apply(Q_hybrids[,2:21], 1, mean)
+
+### Figure S14
+
+plot(1-Q_hybrids$rep11,
+     log = "y",
+     las = 1, 
+     col = "#A3195B",
+     pch = 20,
+     cex=2,
+     ylab="Individual admixture proportion")
+
+# add points for the other replicates
+for (i in c(2:11, 13:21)) {
+  points(1-Q_hybrids[,i],
+         pch=20,
+         col="#00000030")
+}
+
+abline(h = 2e-4, col="red")
+
+### Based on the above, we "correct" all values 
+### between 1e-5 (the minimum) and 2e-4 and assign them to 1e-5
+tmp <- as.matrix(k12_renamed)
+tmp[which(tmp < 2e-4)] <- 1e-5
+# In Formica, 0.99989 is the maximum value 
+# (because all K-1 other clusters have 1e-5)
+tmp[which(tmp > 1-2e-4)] <- 0.99989
+k12_renamed <- as.data.frame(tmp)
 
 
+######################################
+### Estimating introgression rates ###
+######################################
 # I compute hybridization rate directionally, from sp2 into sp1.
 # as the sum of admixture proportions from sp2 into sp1 divided by the number of individuals in sp1.
 # This basically measures the average contribution of sp2 into sp1.
@@ -435,6 +496,25 @@ Q.for.figure$pure[which(Q.for.figure$majority_cluster %in% names(sort(intr_amoun
 ## Step 3: Plot
 par(mfrow=c(1,1), mai=c(0.1, 0.5, 0.1, 0.1))
 barplot(t(as.matrix(Q.for.figure[,c(1,2,4)])), las = 2, cex.names = 1, space = 0, border = NA, col=c("#A3195B", "grey80", "grey90"))
+
+
+#################################################
+### Summary table with thresholds -- Table S1 ###
+#################################################
+intro_table <- data.frame(sp = sort(unique(Q.for.figure$majority_cluster)))
+
+# Set thresholds as average values for all backcross values
+# plus some arbitrary thresholds (10%, 5%, 1%, and 2e-4 which is essentially zero)
+thresholds = c(0.5^(2:11), 0.1, 0.05, 0.01, 2e-4)
+for (t in thresholds) {
+  counts <- tapply(Q.for.figure$introgressed > t,
+                   Q.for.figure$majority_cluster,
+                   sum, na.rm = TRUE)
+  intro_table[[paste0("n_above_", t)]] <- as.vector(counts[as.character(intro_table$sp)])
+}
+
+write.table(intro_table, "Formica_introgression_thresholds_summary.txt", quote = F, row.names = F)
+
 
 #########################################
 ### Genetic distances between species ###
@@ -586,3 +666,225 @@ geo <- subset(geo.all, geo.all$CATALOGUENUMBER %in% pure)
 
 # write to a file
 write.table(geo, "Formica_for_niche.csv", sep=";", row.names = F, quote = F)
+
+###########################
+### Mapping per species ###
+###########################
+
+mapping <- read.csv("mappingreads_Formica.csv", h=T)
+mapping$sp <- meta$sp.nucl[match(mapping$ID, meta$CATALOGUENUMBER)]
+mapping$x <- NA
+mapping$x[which(mapping$sp == "Form_fusc")] <- 0.00429946 / 2
+mapping$x[which(mapping$sp == "Form_cuni")] <- 0.008157779
+mapping$x[which(mapping$sp == "Form_exse")] <- 0.008636585
+mapping$x[which(mapping$sp == "Form_lema")] <- 0.00429946
+mapping$x[which(mapping$sp == "Form_lugu")] <- 0.009006199
+mapping$x[which(mapping$sp == "Form_para")] <- 0.009035892
+mapping$x[which(mapping$sp == "Form_poly")] <- 0.008949149
+mapping$x[which(mapping$sp == "Form_prat")] <- 0.009014967
+mapping$x[which(mapping$sp == "Form_pres")] <- 0.009297801
+mapping$x[which(mapping$sp == "Form_rufa")] <- 0.009044322
+mapping$x[which(mapping$sp == "Form_rufi")] <- 0.00825757
+mapping$x[which(mapping$sp == "Form_sang")] <- 0.008184958
+
+boxplot(mapping$Map.Perc ~ mapping$sp, las=2, xlab="", ylab = "Percentage of reads mapping")
+plot(mapping$Map.Perc ~ jitter(mapping$x, factor = 10), pch=20, col="#00000030", las=1, xlab = "dxy", ylab = "Percentage of reads mapping")
+plot(mapping$Map.Perc ~ jitter(mapping$x, factor = 10), pch=20, col="#00000030", las=1, xlab = "dxy", ylab = "Percentage of reads mapping", ylim=c(95, 100))
+
+
+
+mapping.summary <- data.frame(sp=names(table(mapping$sp)), genus = "Form", dxy = NA, mapping.mean = NA, mapping.SD = NA)
+for (i in mapping.summary$sp) {
+  mapping.summary$dxy[which(mapping.summary$sp == i)] = mapping$x[which(mapping$sp == i)][1]
+  mapping.summary$mapping.mean[which(mapping.summary$sp == i)] = mean(mapping$Map.Perc[which(mapping$sp == i)])
+  mapping.summary$mapping.SD[which(mapping.summary$sp == i)] = sd(mapping$Map.Perc[which(mapping$sp == i)])
+}
+
+write.table(mapping.summary, "Form_mapping_summary.txt", quote = F, sep = "\t")
+
+
+################################
+### Missing data per species ###
+################################
+species = names(table(meta$sp.nucl))
+par(mfrow = c(3, round(length(species)/3)), mai=c(0.8, 0.3, 0.2, 0.1))
+for (i in species) {
+  hist(meta$percent_missing[which(meta$sp.nucl == i)], xlim=c(0, 1), main=i, ylab = "", xlab = "Proportion of missing data", las=1)
+}
+
+sum(meta$percent_missing > 0.5) / length(meta$percent_missing)
+
+Q.for.figure$miss <- meta$percent_missing[match(dimnames(Q.for.figure)[[1]], meta$CATALOGUENUMBER)]
+
+Q.for.figure$col <- NA
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_fusca")] <- "#603913"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_lema")] <- "#1B75BC"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_cuni")] <- "#A97C50"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_rufi")] <- "#00A19A"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_pres")] <- "#8DC63F"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_exse")] <- "#006633"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_lugu")] <- "#9D1E63"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_para")] <- "#29235C"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_rufa")] <- "#D45E4D"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_poly")] <- "#CBBBA0"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_prat")] <- "#D7DF23"
+Q.for.figure$col[which(Q.for.figure$majority_cluster == "Form_sang")] <- "#BE1E2D"
+
+Q.for.figure$introgressed2 <- Q.for.figure$introgressed
+Q.for.figure$introgressed2 [which(Q.for.figure$introgressed == 0.00011)] <- 0
+
+par(mfrow = c(1,1), mai=c(0.8, 0.8, 0.2, 0.1))
+
+plot(Q.for.figure$introgressed ~ Q.for.figure$miss, log="y", pch=20, col=Q.for.figure$col, cex = 2, las = 1, ylab = "Introgression proportion", xlab = "proportion of missing data")
+(zi.miss <- glmmTMB(introgressed ~ miss + (1|majority_cluster),
+                  ziformula = ~ miss + (1|majority_cluster), 
+                  family = beta_family(link = "logit"), 
+                  data=Q.for.figure))
+
+summary(zi.miss)
+
+########################
+### Maps per species ###
+########################
+# This part was written in large parts by Claude Opus 5.5
+
+library(terra)
+library(sf)
+library(elevatr)
+library(geodata)
+
+crs_ch <- "EPSG:21781"
+
+# ---- 1) Vaud boundary (GADM) ----
+ch   <- geodata::gadm("CHE", level = 1, path = tempdir())
+vaud <- ch[ch$NAME_1 == "Vaud", ]
+
+# ---- 1) Elevation model download (AWS Terrain Tiles via elevatr) ----
+# z = zoom level: 9 ~ 200 m, 10 ~ 100 m, 11 ~ 50 m pixels (higher = slower)
+dem <- elevatr::get_elev_raster(sf::st_as_sf(vaud), z = 10, clip = "bbox")
+dem <- rast(dem)
+
+# ---- 2) Reproject to Swiss coordinates ----
+dem       <- project(dem, crs_ch, method = "bilinear")
+vaud_ch   <- project(vaud, crs_ch)
+dem       <- mask(crop(dem, vaud_ch), vaud_ch)
+
+# ---- 1) Hillshade ----
+slope  <- terrain(dem, "slope",  unit = "radians")
+aspect <- terrain(dem, "aspect", unit = "radians")
+
+# angle = sun elevation (degrees above horizon), direction = sun azimuth (0 = N, 90 = E)
+hs <- shade(slope, aspect, angle = 40, direction = 315)
+
+# Optional: multidirectional hillshade (average of several sun azimuths)
+# hs <- mean(rast(lapply(c(270, 315, 0, 45),
+#                        function(d) shade(slope, aspect, angle = 45, direction = d))))
+
+## Define colour palette and min/max introgression values in the dataset
+meta$introgressed <- NA
+meta$introgressed[match(row.names(Q.for.figure), meta$CATALOGUENUMBER)] <- Q.for.figure$introgressed
+
+palette <- colorRampPalette(c("grey95", "#A3195B"))(100)
+
+lmin <- log10(min(meta$introgressed, na.rm = TRUE))
+lmax <- log10(max(meta$introgressed, na.rm = TRUE))
+idx  <- (log10(meta$introgressed) - lmin) / (lmax - lmin)   # 0â€“1
+
+
+# ---- 3) Plot ----
+par(mfrow=c(4,3), mar=c(0.05,0,0,0))
+for (sp in unique(Q.for.figure$majority_cluster)) {
+  plot(hs, col = grey(0:100 / 100), legend = F, axes = F, main=sp)
+  
+  # add admixture proportion to metadata
+  
+  meta$col.for.map <- palette[1 + round(idx * 99)]
+  meta$pch.for.map <- ifelse(meta$introgressed > 10^lmin, 21, 4)  # 21 = filled circle, 4 = x
+  
+  points(meta$X[which(meta$sp.nucl == sp)], meta$Y[which(meta$sp.nucl == sp)], pch = meta$pch.for.map[which(meta$sp.nucl == sp)], bg = meta$col.for.map[which(meta$sp.nucl == sp)], col = 1)
+}
+
+
+#######################
+### ADR per species ###
+#######################
+
+# Function to apply a sum like pmin or pmax
+# Written by Sven Hohenstein here:
+# https://stackoverflow.com/questions/13123638/there-is-pmin-and-pmax-each-taking-na-rm-why-no-psum
+psum <- function(...,na.rm=FALSE) {
+  dat <- do.call(cbind,list(...))
+  res <- rowSums(dat, na.rm=na.rm)
+  idx_na <- !rowSums(!is.na(dat))
+  res[idx_na] <- NA
+  res
+}
+
+
+# get allelic depth for the reference allele at heterozygous sites
+ad.ref <<- extract.gt(vcf, "AD", as.numeric = T)
+ad.ref[which(dp < 8)] <- NA
+ad.ref.het <<- ad.ref
+ad.ref.het[which(gt %in% c("0/0", "1/1"))] <- NA
+
+# and the alternative allele
+ad.alt <<- dp - ad.ref
+ad.alt[which(dp < 8)] <- NA
+ad.alt.het <<- ad.alt
+ad.alt.het[which(gt %in% c("0/0", "1/1"))] <- NA
+
+# compute allelic depth ratio (ADR), defined as
+# depth at the allele supported by most reads divided by total depth at the locus.
+# takes two matrices with allelic depths (integer) as input
+get.ad.ratio <<- function(ad.ref, ad.alt) return(pmax(ad.ref, ad.alt) / mapply(psum, ad.ref, ad.alt, na.rm=T))
+
+# use the function on the whole dataset
+AD.ratio <- get.ad.ratio(as.matrix(ad.ref.het), as.matrix(ad.alt.het))
+
+# get positions of heterozygote genotypes
+het_genotypes <- which(gt %in% c("0/1", "1/0"))
+
+# subset depth values at heterozygote genotypes only
+dp.het <- dp[het_genotypes]
+
+# this function samples a number of reads for one of the alleles
+# following a binomial distribution and equal probabilities for both alleles
+# given the depth at the locus
+sim.ad <- function(depth) {
+  rbinom(n = 1, size = depth, prob = 0.5)
+}
+
+# probably not the most efficient way but it works.
+# applies sim.ad.ref on observed depth values at heterozygous loci
+sim.ad.ref <- unlist(lapply(X = dp.het, FUN = sim.ad))
+
+# create a dataframe with simulated AD at both alleles
+ad.df <- data.frame(A=sim.ad.ref, B=dp.het - sim.ad.ref)
+
+# compute ADR for the simulated AD values
+sim.ad.ratio <- get.ad.ratio(apply(ad.df, 1, max), apply(ad.df, 1, min))
+
+
+### Loop through species
+
+par(mfrow=c(1,4), mai=c(0.5, 0.1, 0.4, 0.1))
+
+for(sp in unique(sort(Q.for.figure$majority_cluster))) {
+  # Getthe list of individuals from this species
+  individuals <- dimnames(Q.for.figure)[[1]][which(Q.for.figure$majority_cluster == sp)]
+  plot(NULL, xlim=c(0.45, 0.7), ylim=c(0,30), xlab="ADR", ylab="", main=sp, yaxt="n", las=1)
+  # For each individual of this species
+  for (i in which(dimnames(AD.ratio)[[2]] %in% individuals)) {
+    this_individual_name <- dimnames(AD.ratio)[[2]][i]
+    # Only if there are enough non-NA ADR values
+    if (sum(is.na(AD.ratio[,i]) == F) > 10) {
+      col.ADR = "#00000030"
+      if (Q.for.figure$introgressed[which(dimnames(Q.for.figure)[[1]] == this_individual_name)] > 2e-04) {
+        col.ADR <- "#FF000080"
+      }
+      points(density(AD.ratio[,i][which(AD.ratio[,i] != 1)], na.rm=T) , type="l", col=col.ADR)
+    }
+  }
+  # Add the simulated distribution
+  # points(density(sim.ad.ratio, bw = 0.01) , type="l", lwd=3, col="#00A19A")
+}
